@@ -1,6 +1,6 @@
-# 🪙 paisa-pilot
+# LazyLedger
 
-> Automate your personal expense tracking — from HDFC SMS to Notion + Splitwise, in under 10 seconds.
+> Automate your personal expense tracking - from HDFC SMS to Notion + Splitwise, in under 10 seconds.
 
 Built for the Indian UPI/HDFC ecosystem. No third-party apps, no subscriptions, no servers. Just your phone, Google Apps Script, and a Notion database.
 
@@ -9,10 +9,10 @@ Built for the Indian UPI/HDFC ecosystem. No third-party apps, no subscriptions, 
 ## What it does
 
 **When you pay:**
-HDFC SMS arrives → iPhone Shortcut fires automatically -> you confirm description, category, and whether it's shared (10 seconds) → entry created in Notion + Splitwise updated if shared.
+HDFC SMS arrives -> iPhone Shortcut fires automatically -> you confirm description, category, and whether it's shared (10 seconds) -> entry created in Notion + Splitwise updated if shared.
 
 **When your flatmate pays:**
-They log to Splitwise → Google Apps Script polls every hour -> Notion entry auto-created -> you get an email to set the category.
+They log to Splitwise -> Google Apps Script polls every hour -> Notion entry auto-created -> you get an email to set the category.
 
 ---
 
@@ -34,22 +34,22 @@ They log to Splitwise → Google Apps Script polls every hour -> Notion entry au
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│                    FLOW 1: YOU PAY                   │
-│                                                      │
-│  HDFC SMS → iPhone Shortcut → [10-sec prompt]        │
-│                ↓                    ↓                │
-│           Notion DB           Splitwise              │
-│         (always)           (if shared)               │
+│                    FLOW 1: YOU PAY                  │
+│                                                     │
+│  HDFC SMS -> iPhone Shortcut -> [10-sec prompt]     │
+│                ↓                    ↓               │
+│           Notion DB           Splitwise             │
+│         (always)           (if shared)              │
 └─────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────┐
-│                 FLOW 2: FLATMATE PAYS                │
-│                                                      │
-│  Flatmate → Splitwise → Google Apps Script           │
-│                         (polls hourly via API)       │
-│                              ↓                       │
-│                         Notion DB                    │
-│                    + Email notification              │
+│                 FLOW 2: FLATMATE PAYS               │
+│                                                     │
+│  Flatmate -> Splitwise -> Google Apps Script        │
+│                         (polls hourly via API)      │
+│                              ↓                      │
+│                         Notion DB                   │
+│                    + Email notification             │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -70,19 +70,19 @@ They log to Splitwise → Google Apps Script polls every hour -> Notion entry au
 ### 1. Notion Setup
 
 1. Go to [notion.so/my-integrations](https://notion.so/my-integrations)
-2. Create a new integration → name it `Expense Tracker`
+2. Create a new integration -> name it `Expense Tracker`
 3. Copy the **Internal Integration Secret** (`secret_xxx...`)
 4. Create your monthly expense database with these properties:
 
 | Property | Type | Options |
 |---|---|---|
-| Description | Title | — |
-| Date | Date | — |
+| Description | Title | - |
+| Date | Date | - |
 | Amount | Number | Rupee format |
 | Category | Multi-select | See category list below |
 | Payment Method | Select | Phone Pe, CRED UPI, Credit Card |
 
-5. Share the database with your integration (... menu → Connections)
+5. Share the database with your integration (... menu -> Connections)
 6. Copy the **Database ID** from the URL (32-character string after the last `/`)
 
 **Category list:**
@@ -104,8 +104,8 @@ Others
 ### 2. Splitwise Setup
 
 1. Go to [secure.splitwise.com/apps/new](https://secure.splitwise.com/apps/new)
-2. Register a new app → name it `Expense Tracker` → URL: `https://localhost`
-3. Click **Create API key** → copy the key
+2. Register a new app -> name it `Expense Tracker` -> URL: `https://localhost`
+3. Click **Create API key** -> copy the key
 
 Get your IDs via terminal:
 ```bash
@@ -130,11 +130,11 @@ See [`shortcut/reference.md`](shortcut/reference.md) for the complete step-by-st
 
 ### 4. Google Apps Script Setup
 
-1. Go to [script.google.com](https://script.google.com) → New Project
+1. Go to [script.google.com](https://script.google.com) -> New Project
 2. Paste the contents of [`google-apps-script/splitwise-to-notion.gs`](google-apps-script/splitwise-to-notion.gs)
 3. Fill in your credentials in the `CONFIG` object at the top
 4. Run `testScript` first to verify all connections
-5. Set up a trigger: `syncSplitwiseToNotion` → Time-driven → Every hour
+5. Set up a trigger: `syncSplitwiseToNotion` -> Time-driven -> Every hour
 
 ---
 
@@ -171,13 +171,13 @@ At the start of each month:
 The Google Apps Script:
 1. Calls `GET /api/v3.0/get_expenses?group_id=YOUR_GROUP_ID`
 2. Filters for expenses created by your flatmate since the last run
-3. Auto-detects category from description keywords (Blinkit → Groceries, Zomato → Outside food, etc.)
-4. Creates a Notion entry — with `⚠️ [FLATMATE]` prefix if category is ambiguous
+3. Auto-detects category from description keywords (Blinkit -> Groceries, Zomato -> Outside food, etc.)
+4. Creates a Notion entry - with `⚠️ [FLATMATE]` prefix if category is ambiguous
 5. Emails you with a direct link to review
 
 ---
 
-## Keyword → Category Mapping
+## Keyword -> Category Mapping
 
 Extend this in the `KEYWORD_MAP` object in the script:
 
@@ -204,4 +204,4 @@ Extend this in the `KEYWORD_MAP` object in the script:
 
 ## License
 
-MIT — use it, fork it, improve it.
+MIT - use it, fork it, improve it.
