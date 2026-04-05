@@ -1,0 +1,19 @@
+# Credentials — never commit these
+*.env
+.env.*
+config.local.js
+secrets.js
+credentials.json
+
+# Files that might accidentally contain API keys
+*.log
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
