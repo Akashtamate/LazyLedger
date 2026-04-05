@@ -1,10 +1,10 @@
-# iPhone Shortcut — Complete Reference
+# iPhone Shortcut - Complete Reference
 
 ## Trigger
 
 - **Type:** Message Automation
 - **Message contains:** `From HDFC Bank A/C *XXXX`  replace with your last 4 digits
-- **From:** (leave blank — works with all HDFC sender IDs: AD-, JD-, VM-, etc.)
+- **From:** (leave blank - works with all HDFC sender IDs: AD-, JD-, VM-, etc.)
 - **Run Immediately:** ON
 
 ---
@@ -15,23 +15,23 @@
 WHEN message received containing "From HDFC Bank A/C *XXXX":
 
   1. MATCH regex Rs\.([0-9,]+(?:\.[0-9]{1,2})?) in Message Body
-  2. GET group at index 1 from Matches → RawAmount
+  2. GET group at index 1 from Matches -> RawAmount
   3. REPLACE "," with "" in RawAmount
   4. SET Amount = cleaned number
-  5. CALCULATE Amount + 0 → RawAmountNumber  (converts text to number)
+  5. CALCULATE Amount + 0 -> RawAmountNumber  (converts text to number)
 
-  6. SET PaymentMethod = "Phone Pe"  ← default
+  6. SET PaymentMethod = "Phone Pe"  <- default
 
-  7. ASK "What was this expense for?" → Description
-  8. SHOW category list → Category
-  9. SHOW [Yes - Split with Anup / No - Just me] → IsShared
-  10. FORMAT current date as yyyy-MM-dd → Today
+  7. ASK "What was this expense for?" -> Description
+  8. SHOW category list -> Category
+  9. SHOW [Yes - Split with Anup / No - Just me] -> IsShared
+  10. FORMAT current date as yyyy-MM-dd -> Today
 
   11. BUILD Notion JSON with all variables
   12. POST to https://api.notion.com/v1/pages
 
   13. IF IsShared contains "Yes":
-        CALCULATE RawAmountNumber / 2 → FinalAmount
+        CALCULATE RawAmountNumber / 2 -> FinalAmount
         BUILD Splitwise JSON
         POST to https://secure.splitwise.com/api/v3.0/create_expense
 
@@ -61,7 +61,7 @@ WHEN message received containing "From HDFC Bank A/C *XXXX":
 | 15 | List | `Yes - Split with Anup` / `No - Just me` |
 | 16 | Choose from List | Input: List |
 | 17 | Set Variable | `IsShared` = Chosen Item |
-| 18 | Current Date | — |
+| 18 | Current Date | - |
 | 19 | Format Date | Format: Custom `yyyy-MM-dd` · Time: None · Input: Current Date |
 | 20 | Set Variable | `Today` = Formatted Date |
 | 21 | Text | Notion JSON body (see template below) |
@@ -74,7 +74,7 @@ WHEN message received containing "From HDFC Bank A/C *XXXX":
 | 28 | Set Variable | `SplitwiseBody` = Text |
 | 29 | Get Contents of URL | POST to Splitwise (see config below) |
 | 30 | **Otherwise** | (empty) |
-| 31 | **End If** | — |
+| 31 | **End If** | - |
 | 32 | Show Notification | Title: `Logged` · Body: Description + Category |
 
 ---
@@ -100,7 +100,7 @@ Others
 
 - **URL:** `https://api.notion.com/v1/pages`
 - **Method:** POST
-- **Request Body:** File → `NotionBody` variable
+- **Request Body:** File -> `NotionBody` variable
 
 **Headers:**
 ```
@@ -109,7 +109,7 @@ Content-Type      application/json
 Notion-Version    2022-06-28
 ```
 
-**Notion JSON body template** (Action 21 — Text action with inline variables):
+**Notion JSON body template** (Action 21 - Text action with inline variables):
 ```json
 {
   "parent": { "database_id": "YOUR_DATABASE_ID" },
@@ -135,7 +135,7 @@ Notion-Version    2022-06-28
 
 - **URL:** `https://secure.splitwise.com/api/v3.0/create_expense`
 - **Method:** POST
-- **Request Body:** File → `SplitwiseBody` variable
+- **Request Body:** File -> `SplitwiseBody` variable
 
 **Headers:**
 ```
@@ -143,7 +143,7 @@ Authorization     Bearer YOUR_SPLITWISE_API_KEY
 Content-Type      application/json
 ```
 
-**Splitwise JSON body template** (Action 27 — Text action with inline variables):
+**Splitwise JSON body template** (Action 27 - Text action with inline variables):
 ```json
 {
   "cost": "[RawAmountNumber]",
@@ -166,7 +166,7 @@ Content-Type      application/json
 1. Create new Notion database for the month
 2. Share it with your Notion integration
 3. Get the new database ID from the URL
-4. In the Shortcut: edit Action 21 (Notion JSON body) → update `database_id`
+4. In the Shortcut: edit Action 21 (Notion JSON body) -> update `database_id`
 
 ---
 
@@ -176,5 +176,5 @@ Content-Type      application/json
 |---|---|---|
 | Amount shows empty | Tested with play button (no real SMS) | Test with a real HDFC payment |
 | Notion entry not created | Wrong database ID or category name mismatch | Check `database_id` and category spelling |
-| Splitwise not updated | `IsShared` variable not matching "Yes" | Check the List items — must start with "Yes" |
+| Splitwise not updated | `IsShared` variable not matching "Yes" | Check the List items - must start with "Yes" |
 | Shortcut doesn't fire | Trigger keyword wrong | Check your account number last 4 digits |
