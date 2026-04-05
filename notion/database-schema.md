@@ -51,13 +51,13 @@ Credit Card
 
 ## Integration Setup
 
-1. Go to notion.so/my-integrations → New Integration
+1. Go to notion.so/my-integrations -> New Integration
 2. Name: `Expense Tracker`
 3. Capabilities: Read, Insert, Update content
 4. Copy the **Internal Integration Secret** (`secret_xxx`)
 5. For each monthly database:
    - Open the database in Notion
-   - Click `...` → Connections → connect `Expense Tracker`
+   - Click `...` -> Connections -> connect `Expense Tracker`
 
 ---
 
@@ -95,6 +95,6 @@ Expenses synced from Splitwise (paid by flatmate) follow this convention:
 
 - **Description:** Prefixed with `⚠️` if category needs review, always suffixed with `[ANUP]`
 - **Category:** Auto-detected from keywords, or `Others` if ambiguous
-- **Payment Method:** `Phone Pe` (placeholder — update if needed)
+- **Payment Method:** `Phone Pe` (placeholder - update if needed)
 
 Example: `⚠️ Electricity bill [ANUP]`
