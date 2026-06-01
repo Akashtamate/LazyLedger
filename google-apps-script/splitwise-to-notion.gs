@@ -10,6 +10,7 @@ const CONFIG = {
   SPLITWISE_API_KEY:  "",
   SPLITWISE_GROUP_ID: "",
   ANUP_USER_ID:       "",
+  YOUR_USER_ID:       "",
 
   NOTION_SECRET:      "",   // secret_xxx from notion.so/my-integrations
   NOTION_DATABASE_ID: "", // Update each month
@@ -28,11 +29,12 @@ const CATEGORIES = [
   "Entertainment",
   "Skincare",
   "Others",
+  "Shopping"
 ];
 
 // ── KEYWORD - CATEGORY AUTO-DETECTION ───────────────────────
 // If description contains any of these words, category is auto-assigned.
-// Otherwise falls back to "⚠️ Needs Category"
+// Otherwise falls back to " Needs Category"
 const KEYWORD_MAP = {
   "blinkit":      "Groceries and Veggies",
   "swiggy instamart": "Groceries and Veggies",
@@ -60,9 +62,10 @@ const KEYWORD_MAP = {
   "spotify":      "Entertainment",
   "prime":        "Entertainment",
   "hotstar":      "Entertainment",
+  "veggies":     "Groceries and Veggies",
 };
 
-// ── MAIN FUNCTION ── Set this as the trigger ─────────────────
+// ── MAIN FUNCTION ── 
 function syncSplitwiseToNotion() {
   const lastRunTime = getLastRunTime();
   const newExpenses = fetchAnupExpenses(lastRunTime);
@@ -103,8 +106,8 @@ function fetchAnupExpenses(since) {
   return data.expenses.filter(exp => {
     if (exp.deleted_at) return false;                          // Skip deleted
     if (exp.payment) return false;                             // Skip settlements
-    const createdBy = exp.created_by && exp.created_by.id;
-    if (String(createdBy) !== String(CONFIG.ANUP_USER_ID)) return false; // Only Anup's
+    const anupUser = exp.users && exp.users.find(u => String(u.user_id) === String(CONFIG.ANUP_USER_ID));
+    if (!anupUser || parseFloat(anupUser.paid_share) <= 0) return false; // Only expenses where Anup paid 
     const createdAt = new Date(exp.created_at);
     return createdAt > sinceDate;                              // Only new ones
   });
@@ -123,7 +126,9 @@ function detectCategory(description) {
 // ── CREATE NOTION ENTRY ───────────────────────────────────────
 function createNotionEntry(expense) {
   const description  = expense.description || "Expense from Anup";
-  const amount       = parseFloat(expense.cost);
+  const amount = parseFloat(expense.cost);
+  const myUser = expense.users.find(u => String(u.user_id) === String(CONFIG.YOUR_USER_ID));
+  const myOwedShare = myUser ? parseFloat(myUser.owed_share) : amount / 2;
   const date         = expense.date ? expense.date.split("T")[0] : new Date().toISOString().split("T")[0];
   const autoCategory = detectCategory(description);
   const category     = autoCategory || "Others";
@@ -137,7 +142,7 @@ function createNotionEntry(expense) {
           text: { content: needsReview ? "⚠️ " + description + " [ANUP]" : description + " [ANUP]" }
         }]
       },
-      Amount:          { number: amount },
+      Amount:          { number: myOwedShare },
       Category:        { multi_select: [{ name: category }] },
       "Payment Method": { select: { name: "Phone Pe" } },  // Anup paid — adjust if needed
       Date:            { date: { start: date } },
@@ -176,14 +181,14 @@ function sendReviewNotification(expense, notionUrl) {
     // Auto-categorised — send a simple FYI
     GmailApp.sendEmail(
       CONFIG.YOUR_EMAIL,
-      ` Anup added ₹${amount} — logged to Notion`,
+      `Anup added ₹${amount} — logged to Notion`,
       `Expense: ${description}\nAmount: ₹${amount}\nCategory: ${autoCategory} (auto-detected)\n\nNotion: ${notionUrl}`
     );
   } else {
     // Needs manual category — send a review request
     GmailApp.sendEmail(
       CONFIG.YOUR_EMAIL,
-      `⚠️ Review needed: Anup added ₹${amount}`,
+      `Review needed: Anup added ₹${amount}`,
       `Expense: ${description}\nAmount: ₹${amount}\n\nThis expense needs a category. Open Notion to set it:\n${notionUrl}\n\nCategories to choose from:\n${CATEGORIES.join("\n")}`
     );
   }
@@ -227,5 +232,5 @@ function testScript() {
   const notionData = JSON.parse(notionTest.getContentText());
   Logger.log("Notion OK — database: " + (notionData.title ? notionData.title[0].plain_text : "connected"));
 
-  Logger.log("All connections verified ✓");
+  Logger.log("All connections verified");
 }
